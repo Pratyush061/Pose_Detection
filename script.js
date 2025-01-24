@@ -21,11 +21,14 @@ async function setupBackend() {
 
 // Setup camera
 async function setupCamera() {
-    video.width = 360;
-    video.height = 270;
+    // Set canvas to match video dimensions exactly
+    video.width = 640;
+    video.height = 360;
+    canvas.width = video.width;
+    canvas.height = video.height;
 
     const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: { width: 640, height: 360 }
     });
     video.srcObject = stream;
 
@@ -65,6 +68,7 @@ function drawSkeleton(keypoints) {
         const kp1 = keypoints[i];
         const kp2 = keypoints[j];
 
+        // Simplified scaling approach
         if (kp1.score > threshold && kp2.score > threshold) {
             ctx.beginPath();
             ctx.moveTo(kp1.x, kp1.y);
@@ -97,9 +101,6 @@ async function main() {
     await setupBackend();
     await setupCamera();
     video.play();
-
-    canvas.width = video.width;
-    canvas.height = video.height;
 
     const detector = await loadMoveNet();
     detectPose(detector);
