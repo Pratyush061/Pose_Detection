@@ -33,10 +33,10 @@ async function loadMoveNet() {
     });
 }
 
-// Draw keypoints with updated score threshold (0.3)
+// Draw keypoints with updated score threshold (0.5)
 function drawKeypoints(keypoints) {
     keypoints.forEach((keypoint) => {
-        if (keypoint.score > 0.65) { // Updated threshold
+        if (keypoint.score > 0.5) { // Updated threshold
             ctx.beginPath();
             ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
             ctx.fillStyle = 'red';
@@ -45,7 +45,7 @@ function drawKeypoints(keypoints) {
     });
 }
 
-// Draw skeleton with updated score threshold (0.3)
+// Draw skeleton with updated score threshold (0.5)
 function drawSkeleton(keypoints) {
     const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.MoveNet);
 
@@ -53,7 +53,7 @@ function drawSkeleton(keypoints) {
         const kp1 = keypoints[i];
         const kp2 = keypoints[j];
 
-        if (kp1.score > 0.65 && kp2.score > 0.65) { // Updated threshold
+        if (kp1.score > 0.5 && kp2.score > 0.5) { // Updated threshold
             ctx.beginPath();
             ctx.moveTo(kp1.x, kp1.y);
             ctx.lineTo(kp2.x, kp2.y);
