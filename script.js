@@ -39,7 +39,7 @@ function drawKeypoints(keypoints) {
         if (keypoint.score > 0.5) { // Updated threshold
             ctx.beginPath();
             ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = 'yellow';
             ctx.fill();
         }
     });
@@ -58,7 +58,7 @@ function drawSkeleton(keypoints) {
             ctx.moveTo(kp1.x, kp1.y);
             ctx.lineTo(kp2.x, kp2.y);
             ctx.lineWidth = 2;
-            ctx.strokeStyle = 'green';
+            ctx.strokeStyle = 'blue';
             ctx.stroke();
         }
     });
