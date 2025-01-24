@@ -21,8 +21,8 @@ async function setupBackend() {
 
 // Setup camera
 async function setupCamera() {
-    video.width = 640;
-    video.height = 480;
+    video.width = 360;
+    video.height = 270;
 
     const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
