@@ -2,6 +2,14 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
 
+// Set TensorFlow.js backend to WebGL
+async function setupBackend() {
+    await tf.setBackend('webgl');
+    await tf.ready();
+    console.log('Using backend:', tf.getBackend());
+}
+
+// Setup camera
 async function setupCamera() {
     video.width = 640;
     video.height = 480;
@@ -18,15 +26,17 @@ async function setupCamera() {
     });
 }
 
+// Load MoveNet model
 async function loadMoveNet() {
     return await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING
     });
 }
 
+// Draw keypoints with updated score threshold (0.3)
 function drawKeypoints(keypoints) {
     keypoints.forEach((keypoint) => {
-        if (keypoint.score > 0.5) {
+        if (keypoint.score > 0.3) { // Updated threshold
             ctx.beginPath();
             ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
             ctx.fillStyle = 'red';
@@ -35,6 +45,7 @@ function drawKeypoints(keypoints) {
     });
 }
 
+// Draw skeleton with updated score threshold (0.3)
 function drawSkeleton(keypoints) {
     const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.MoveNet);
 
@@ -42,7 +53,7 @@ function drawSkeleton(keypoints) {
         const kp1 = keypoints[i];
         const kp2 = keypoints[j];
 
-        if (kp1.score > 0.5 && kp2.score > 0.5) {
+        if (kp1.score > 0.3 && kp2.score > 0.3) { // Updated threshold
             ctx.beginPath();
             ctx.moveTo(kp1.x, kp1.y);
             ctx.lineTo(kp2.x, kp2.y);
@@ -53,6 +64,7 @@ function drawSkeleton(keypoints) {
     });
 }
 
+// Detect and draw poses
 async function detectPose(detector) {
     const poses = await detector.estimatePoses(video);
 
@@ -68,7 +80,9 @@ async function detectPose(detector) {
     requestAnimationFrame(() => detectPose(detector));
 }
 
+// Main function
 async function main() {
+    await setupBackend(); // Set backend to WebGL
     await setupCamera();
     video.play();
 
