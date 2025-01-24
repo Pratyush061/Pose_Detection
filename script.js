@@ -1,6 +1,16 @@
 const video = document.getElementById('video');
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
+const thresholdSlider = document.getElementById('threshold-slider');
+const thresholdValue = document.getElementById('threshold-value');
+
+let threshold = 0.5;
+
+// Update threshold dynamically
+thresholdSlider.addEventListener('input', (event) => {
+    threshold = parseFloat(event.target.value);
+    thresholdValue.textContent = threshold.toFixed(1);
+});
 
 // Set TensorFlow.js backend to WebGL
 async function setupBackend() {
@@ -15,7 +25,7 @@ async function setupCamera() {
     video.height = 480;
 
     const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
+        video: true,
     });
     video.srcObject = stream;
 
@@ -29,14 +39,14 @@ async function setupCamera() {
 // Load MoveNet model
 async function loadMoveNet() {
     return await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
     });
 }
 
-// Draw keypoints with updated score threshold (0.5)
+// Draw keypoints with dynamic threshold
 function drawKeypoints(keypoints) {
     keypoints.forEach((keypoint) => {
-        if (keypoint.score > 0.5) { // Updated threshold
+        if (keypoint.score > threshold) {
             ctx.beginPath();
             ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
             ctx.fillStyle = 'yellow';
@@ -45,15 +55,17 @@ function drawKeypoints(keypoints) {
     });
 }
 
-// Draw skeleton with updated score threshold (0.5)
+// Draw skeleton with dynamic threshold
 function drawSkeleton(keypoints) {
-    const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.MoveNet);
+    const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(
+        poseDetection.SupportedModels.MoveNet
+    );
 
     adjacentKeyPoints.forEach(([i, j]) => {
         const kp1 = keypoints[i];
         const kp2 = keypoints[j];
 
-        if (kp1.score > 0.5 && kp2.score > 0.5) { // Updated threshold
+        if (kp1.score > threshold && kp2.score > threshold) {
             ctx.beginPath();
             ctx.moveTo(kp1.x, kp1.y);
             ctx.lineTo(kp2.x, kp2.y);
@@ -82,7 +94,7 @@ async function detectPose(detector) {
 
 // Main function
 async function main() {
-    await setupBackend(); // Set backend to WebGL
+    await setupBackend();
     await setupCamera();
     video.play();
 
